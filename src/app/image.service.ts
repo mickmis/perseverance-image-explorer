@@ -11,7 +11,7 @@ import {tap} from 'rxjs/operators';
 export class ImageService {
 
   private _selectedResolution: ImageResolution;
-  private corsProxyUrl = 'http://corsenabler.herokuapp.com/';
+  private corsProxyUrl = 'https://corsenabler.herokuapp.com/';
 
   // Gpath = 'assets/RRG_0002_0667129481_373ECM_N0010052AUT_04096_00_2I3J01.png';
   // Bpath = 'assets/RRB_0002_0667129492_604ECM_N0010052AUT_04096_00_2I3J01.png';
