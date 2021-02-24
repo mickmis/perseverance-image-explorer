@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "perseverance-images": {
+    "perseverance-image-explorer": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/perseverance-images",
+            "outputPath": "dist/perseverance-image-explorer",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -26,7 +26,9 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/scripts/hdrpng.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -61,18 +63,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "perseverance-images:build"
+            "browserTarget": "perseverance-image-explorer:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "perseverance-images:build:production"
+              "browserTarget": "perseverance-image-explorer:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "perseverance-images:build"
+            "browserTarget": "perseverance-image-explorer:build"
           }
         },
         "test": {
@@ -109,16 +111,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "perseverance-images:serve"
+            "devServerTarget": "perseverance-image-explorer:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "perseverance-images:serve:production"
+              "devServerTarget": "perseverance-image-explorer:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "perseverance-images"
+  "defaultProject": "perseverance-image-explorer"
 }

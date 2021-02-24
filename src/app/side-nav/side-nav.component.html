@@ -1,0 +1,14 @@
+<div class="side-nav-element">
+  <h2 style="text-align: center;">Options</h2>
+</div>
+
+<div class="side-nav-element">
+  <label for="resolutionSlider">Image Resolution</label>
+  <mat-slider id="resolutionSlider" vertical thumbLabel [displayWith]="ImageResolutionToString" tickInterval="1" min="1" max="4" step="1"
+              (change)="resolutionSliderChange($event)" [value]="imageService.selectedResolution"></mat-slider>
+</div>
+
+<div class="side-nav-element">
+<!--  <button (click)="loadImages()" mat-raised-button color="warn">Load</button>
+  <button (click)="x()" mat-raised-button>Parsed Color</button>-->
+</div>

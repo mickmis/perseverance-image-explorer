@@ -1,0 +1,31 @@
+<mat-tab-group [(selectedIndex)]="selectedTabIdx" (selectedIndexChange)="selectedTabChange($event)"
+               dynamicHeight animationDuration="0ms" mat-align-tabs="start">
+
+  <mat-tab *ngFor="let cam of AllCams; let idx = index" label="{{cam.name}}">
+    <ng-template matTabContent>
+
+      <div class="images-panel" *ngIf="idx === selectedTabIdx">
+        <mat-expansion-panel hideToggle (opened)="loadImage(colImg)" *ngFor="let colImg of loadColorizableImages(cam)|async">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{metadataService.parseMarsTime(colImg.red.date_taken_mars)}} (colorized)
+            </mat-panel-title>
+            <mat-panel-description>
+              This is a summary of the content
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <ng-template matExpansionPanelContent>
+            <img alt="{{colImg.id}}" class="colorized-image" src="{{colImg.colorizedDataUrl}}" />
+            <p>
+              {{colImg.red.caption}}
+              {{colImg.green.caption}}
+              {{colImg.blue.caption}}
+            </p>
+          </ng-template>
+        </mat-expansion-panel>
+      </div>
+    </ng-template>
+  </mat-tab>
+
+</mat-tab-group>

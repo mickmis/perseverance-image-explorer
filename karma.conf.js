@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/perseverance-images'),
+      dir: require('path').join(__dirname, './coverage/perseverance-image-explorer'),
       subdir: '.',
       reporters: [
         { type: 'html' },

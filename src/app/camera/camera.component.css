@@ -1,0 +1,9 @@
+.images-panel mat-expansion-panel {
+  margin: 1em;
+}
+
+.colorized-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
