@@ -27,7 +27,6 @@
               "src/styles.css"
             ],
             "scripts": [
-              "src/scripts/hdrpng.js"
             ]
           },
           "configurations": {
