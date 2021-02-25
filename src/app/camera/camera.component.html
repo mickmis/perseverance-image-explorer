@@ -5,13 +5,16 @@
     <ng-template matTabContent>
 
       <div class="images-panel" *ngIf="idx === selectedTabIdx">
-        <mat-expansion-panel hideToggle (opened)="loadImage(colImg)" *ngFor="let colImg of loadColorizableImages(cam)|async">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
+        <mat-expansion-panel hideToggle (opened)="loadImage(colImg)" *ngFor="let colImg of loadColorizableImages(cam)|async" #panel>
+          <mat-expansion-panel-header collapsedHeight="250px">
+            <mat-panel-title style="display: flex; align-items: center;">
               {{metadataService.parseMarsTime(colImg.red.date_taken_mars)}} (colorized)
             </mat-panel-title>
-            <mat-panel-description>
-              {{colImg.red.title}}
+
+            <mat-panel-description style="display: flex; align-items: center; justify-content: space-around;">
+              <span>{{colImg.red.title}}</span>
+              <img *ngIf="!panel.expanded" style="border: 1px solid rgba(255,255,255,.7); border-radius: 5%;"
+                   alt="Thumbnail of {{colImg.red.imageid}}" height="240px" src="{{colImg.red.image_files.small}}" />
             </mat-panel-description>
           </mat-expansion-panel-header>
 
@@ -26,11 +29,17 @@
               <a class="no-color-link" href="{{colImg.green.image_files.full_res}}">green</a> and
               <a class="no-color-link" href="{{colImg.blue.image_files.full_res}}">blue</a>.
             </p>
+            <!-- todo: use this for download or other stuff
+            <mat-action-row>
+              <button mat-button color="accent" (click)="nextStep()">Download</button>
+            </mat-action-row>
+            -->
           </ng-template>
         </mat-expansion-panel>
       </div>
 
       <div *ngIf="displayDebug" style="padding: 1em;">
+        <img id="debug-test-img" />
         <p *ngFor="let met of loadImagesMetadata(cam)|async" style="font-family: monospace;">
           <a class="no-color-link" href="{{met.image_files.full_res}}">{{met.imageid}}</a> -
           {{met.camera.camera_position}} - {{met.camera.camera_vector}}
