@@ -21,7 +21,7 @@ export class CameraComponent implements OnInit {
 
   private _selectedTabIdx: number;
 
-  constructor(public metadataService: MetadataService, private imageService: ImageService) {
+  constructor(public metadataService: MetadataService, public imageService: ImageService) {
   }
 
   ngOnInit(): void {
@@ -55,6 +55,13 @@ export class CameraComponent implements OnInit {
 
   loadImage(img: ColorizedImage): void {
     this.imageService.colorize(of(img)).subscribe();
+  }
+
+  downloadImage(img: ColorizedImage): void {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = img.colorizedDataUrl;
+    downloadLink.download = img.id;
+    downloadLink.click();
   }
 
   selectedTabChange(tabIdx: number): void {

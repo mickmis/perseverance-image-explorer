@@ -1,10 +1,12 @@
 import {ImageMetadata} from './metadata';
+import {ImageResolution} from './image-resolution';
 
 export class ColorizedImage {
   red: ImageMetadata;
   green: ImageMetadata;
   blue: ImageMetadata;
   colorizedDataUrl?: string;
+  colorizedResolution?: ImageResolution;
 
   get id(): string {
     const ids = [];

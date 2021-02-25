@@ -29,11 +29,10 @@
               <a class="no-color-link" href="{{colImg.green.image_files.full_res}}">green</a> and
               <a class="no-color-link" href="{{colImg.blue.image_files.full_res}}">blue</a>.
             </p>
-            <!-- todo: use this for download or other stuff
             <mat-action-row>
-              <button mat-button color="accent" (click)="nextStep()">Download</button>
+              <button [disabled]="colImg.colorizedResolution === imageService.selectedResolution" mat-button color="accent" (click)="loadImage(colImg)">Recompute</button>
+              <button mat-button color="accent" (click)="downloadImage(colImg)">Download</button>
             </mat-action-row>
-            -->
           </ng-template>
         </mat-expansion-panel>
       </div>

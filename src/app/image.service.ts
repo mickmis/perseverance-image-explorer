@@ -21,16 +21,15 @@ export class ImageService {
   Epath = 'assets/FRE_0000_0666958373_100ECM_N0010052AUT_04096_00_0LLJ01.png';
 
   constructor() {
-    this.selectedResolution = ImageResolution.Full;
+    this.selectedResolution = ImageResolution.Medium;
     this._loadingCount = 0;
   }
 
   colorize(pImg: Observable<ColorizedImage>): Observable<ColorizedImage> {
-    // Image.load(this.Epath).then(tt => console.log(tt));
 
     return pImg.pipe(
       tap(img => {
-        if (img.colorizedDataUrl) {
+        if (img.colorizedDataUrl && img.colorizedResolution === this.selectedResolution) {
           return;
         }
         this._loadingCount++;
@@ -63,6 +62,7 @@ export class ImageService {
             bUrl = this.corsProxyUrl + img.blue.image_files.small;
             break;
         }
+        img.colorizedResolution = this.selectedResolution;
 
         return from(
           Image.load(rUrl).then(red =>
