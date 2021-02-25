@@ -1,1 +1,9 @@
 @import '@angular/material/prebuilt-themes/pink-bluegrey.css';
+
+a:link {
+  color: white;
+}
+
+a:visited {
+  color: white;
+}

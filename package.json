@@ -23,6 +23,7 @@
     "@angular/router": "~11.2.1",
     "@fortawesome/angular-fontawesome": "^0.8.2",
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
+    "@fortawesome/free-brands-svg-icons": "^5.15.2",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "image-js": "^0.31.4",
     "rxjs": "~6.6.0",

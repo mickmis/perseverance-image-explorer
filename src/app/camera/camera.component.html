@@ -11,20 +11,32 @@
               {{metadataService.parseMarsTime(colImg.red.date_taken_mars)}} (colorized)
             </mat-panel-title>
             <mat-panel-description>
-              This is a summary of the content
+              {{colImg.red.title}}
             </mat-panel-description>
           </mat-expansion-panel-header>
 
           <ng-template matExpansionPanelContent>
-            <img alt="{{colImg.id}}" class="colorized-image" src="{{colImg.colorizedDataUrl}}" />
+            <figure>
+              <img alt="{{colImg.id}}" class="colorized-image" src="{{colImg.colorizedDataUrl}}" />
+              <figcaption style="text-align: center;">{{colImg.red.title}}</figcaption>
+            </figure>
             <p>
-              {{colImg.red.caption}}
-              {{colImg.green.caption}}
-              {{colImg.blue.caption}}
+              Image colorized from
+              <a class="no-color-link" href="{{colImg.red.image_files.full_res}}">red</a>,
+              <a class="no-color-link" href="{{colImg.green.image_files.full_res}}">green</a> and
+              <a class="no-color-link" href="{{colImg.blue.image_files.full_res}}">blue</a>.
             </p>
           </ng-template>
         </mat-expansion-panel>
       </div>
+
+      <div *ngIf="displayDebug" style="padding: 1em;">
+        <p *ngFor="let met of loadImagesMetadata(cam)|async" style="font-family: monospace;">
+          <a class="no-color-link" href="{{met.image_files.full_res}}">{{met.imageid}}</a> -
+          {{met.camera.camera_position}} - {{met.camera.camera_vector}}
+        </p>
+      </div>
+
     </ng-template>
   </mat-tab>
 

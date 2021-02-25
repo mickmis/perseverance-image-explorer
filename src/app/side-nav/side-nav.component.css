@@ -1,8 +1,20 @@
 #resolutionSlider {
   margin-top: 15px;
-  margin-left: 20px;
 }
 
 .side-nav-element {
   padding: 1em;
+}
+
+.side-nav-element p, h1, h2 {
+  text-align: center;
+}
+
+.side-nav-footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
 }

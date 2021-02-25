@@ -11,28 +11,20 @@ import {ImageId} from './models/image-id';
 })
 export class MetadataService {
 
-  images: ReplaySubject<ImageMetadata[]>;
-  colorizedImages: ReplaySubject<ColorizedImage[]>;
+  lastImagesMetadata: ReplaySubject<ImageMetadata[]>;
 
   private baseUrl = 'https://mars.nasa.gov/rss/api/';
 
   // Sol-00002M15:37:11.985
   private marsTimeRegex = /^Sol-(\d+)M(\d+:\d+):\d+\.\d+$/;
 
+  private _loadingCount: number;
+
   constructor(private http: HttpClient) {
-    this.images = new ReplaySubject(1);
-    this.colorizedImages = new ReplaySubject(1);
+    this.lastImagesMetadata = new ReplaySubject(1);
+    this._loadingCount = 0;
   }
 
-  // todo: have categories per cameras (auto-parsed? not in a first time), have them as tab!
-
-  // todo: provide functions to filter stuff according to what I find in IDs etc.
-  // todo: load not in constructor
-  // todo: XXF in image id probably stands for FULL? e.g. ZL1234 --> OUI F=FULL, and the first 2 are the camera
-
-  // todo: generate a nice chronology?? like vertical with photos loading as it comes?
-
-  // todo: option to choose resolution of image (and default to different stuff if on mobile or desktop)
   private static loadImagesMetadataParams(page: number, search: string[], solRange: [number, number]): HttpParams {
     const params = new HttpParams()
       .set('feed', 'raw_images')
@@ -56,7 +48,11 @@ export class MetadataService {
   }
 
   loadImagesMetadata(search: string[], solRange?: [number, number]): Observable<ImageMetadata[]> {
-    return this.http.get<Metadata>(this.baseUrl, {params: MetadataService.loadImagesMetadataParams(0, search, solRange)}).pipe(
+    return of(null).pipe(
+      tap(() => this._loadingCount++),
+      switchMap(() =>
+        this.http.get<Metadata>(this.baseUrl, {params: MetadataService.loadImagesMetadataParams(0, search, solRange)})
+      ),
 
       // based on the first response, request all the remaining missing metadata
       switchMap(metadata0 => {
@@ -80,7 +76,9 @@ export class MetadataService {
       }),
 
       // parse the image id
-      tap(x => x.forEach(img => img.parsedImageId = new ImageId(img.imageid)))
+      tap(x => x.forEach(img => img.parsedImageId = new ImageId(img.imageid))),
+      tap((x) => this.lastImagesMetadata.next(x.sort((a, b) => b.date_taken_mars.localeCompare(a.date_taken_mars)))),
+      tap(() => this._loadingCount--)
     );
   }
 
@@ -89,64 +87,77 @@ export class MetadataService {
     return `Sol ${parseInt(sol, 10)}, ${time} LST`;
   }
 
-  sortColorizedImages(pImg: Observable<ColorizedImage[]>): Observable<ColorizedImage[]> {
-    return pImg.pipe(map(img => img.sort(
-      (a, b) => b.red.date_taken_mars.localeCompare(a.red.date_taken_mars))
-    ));
+  sortColorizedImages(): (pImg: Observable<ColorizedImage[]>) => Observable<ColorizedImage[]> {
+    return (pImg: Observable<ColorizedImage[]>) => pImg.pipe(
+      tap(() => this._loadingCount++),
+      map(img => img.sort((a, b) => b.red.date_taken_mars.localeCompare(a.red.date_taken_mars))),
+      tap(() => this._loadingCount--),
+    );
   }
 
-  getColorizableImages(images: Observable<ImageMetadata[]>): Observable<ColorizedImage[]> {
-    return images.pipe(
+  getColorizableImages(): (images: Observable<ImageMetadata[]>) => Observable<ColorizedImage[]> {
+    return (images: Observable<ImageMetadata[]>) => images.pipe(
+      tap(() => this._loadingCount++),
 
-      // group images by a specific key
+    // group images by a specific key: camera ID + camera position
       map(allImages => {
-        const groupedImgs = new Map<string, Set<ImageMetadata>>();
+        const groupedImgs = new Map<string, Array<ImageMetadata>>();
         allImages.forEach(img => {
-          const groupKey = img.camera.camera_position;
+          const groupKey = img.parsedImageId.cameraId + img.camera.camera_position;
           if (!groupedImgs.has(groupKey)) {
-            groupedImgs.set(groupKey, new Set<ImageMetadata>());
+            groupedImgs.set(groupKey, new Array<ImageMetadata>());
           }
-          groupedImgs.get(groupKey).add(img);
+          groupedImgs.get(groupKey).push(img);
         });
         return groupedImgs;
       }),
 
+      // sort per date the images
+      tap(groupedImgs => groupedImgs.forEach(imageGroup => imageGroup.sort((a, b) => a.date_taken_mars.localeCompare(b.date_taken_mars)))),
+
       // parse the metadata and generate for each group the ColorizedImage[]
+      // Each group can have several RGB images, in which case the order is important
       map(groupedImgs => {
         const colImgs = Array<ColorizedImage>();
         for (const group of groupedImgs.values()) {
 
-          // we need at least images for RGB
-          if (group.size < 3) {
-            continue;
-          }
-
-          const colImg = new ColorizedImage();
-          for (const img of group.values()) {
+          // tslint:disable-next-line:prefer-for-of
+          for (let imgIdx = 0 ; imgIdx < group.length ; imgIdx++) {
+            const img = group[imgIdx];
             if (!img.parsedImageId) {
               console.warn(`Missing parsed ID for ${img.imageid}`);
               continue;
             }
 
-            if (img.parsedImageId.imageType === 'R') {
-              colImg.red = img;
-            } else if (img.parsedImageId.imageType === 'G') {
-              colImg.green = img;
-            } else if (img.parsedImageId.imageType === 'B') {
-              colImg.blue = img;
-            } else {
-              console.warn(`Ignoring unexpected type ${img.parsedImageId.imageType} of ${img.imageid} (${colImg.id})`);
-            }
-          }
+            if (
+              img.parsedImageId.imageType === 'R' &&
+              group[imgIdx + 1].parsedImageId.imageType === 'G' &&
+              group[imgIdx + 2].parsedImageId.imageType === 'B') {
 
-          if (colImg.red && colImg.green && colImg.blue) {
-            colImgs.push(colImg);
-          } else {
-            console.warn(`Ignoring incomplete colorized image ${colImg.id}`);
+              const colImg = new ColorizedImage();
+              colImg.red = img;
+              colImg.green = group[imgIdx + 1];
+              colImg.blue = group[imgIdx + 2];
+              colImgs.push(colImg);
+              imgIdx += 2;
+
+            } else if (
+              img.parsedImageId.imageType === 'M' ||
+              img.parsedImageId.imageType === 'F' ||
+              img.parsedImageId.imageType === 'E') {
+              console.log(`Ignoring type ${img.parsedImageId.imageType} of ${img.imageid}`);
+            } else {
+              console.warn(`Ignoring unexpected type or incomplete RGB image ${img.parsedImageId.imageType} of ${img.imageid}`, img);
+            }
           }
         }
         return colImgs;
-      })
+      }),
+      tap(() => this._loadingCount--)
     );
+  }
+
+  get loadingCount(): number {
+    return this._loadingCount;
   }
 }

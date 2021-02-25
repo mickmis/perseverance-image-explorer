@@ -5,6 +5,8 @@ import {Observable, of} from 'rxjs';
 import {shareReplay, tap} from 'rxjs/operators';
 import {ColorizedImage} from '../models/colorized-image';
 import {ImageService} from '../image.service';
+import {environment} from '../../environments/environment';
+import {ImageMetadata} from '../models/metadata';
 
 @Component({
   selector: 'app-camera',
@@ -14,6 +16,7 @@ import {ImageService} from '../image.service';
 export class CameraComponent implements OnInit {
   AllCams = AllCams;
 
+  private imagesMetadata: Map<Camera, Observable<ImageMetadata[]>>;
   private colorizedImages: Map<Camera, Observable<ColorizedImage[]>>;
 
   private _selectedTabIdx: number;
@@ -22,20 +25,32 @@ export class CameraComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.colorizedImages = new Map(AllCams.map(cam => [
+    this.imagesMetadata = new Map<Camera, Observable<ImageMetadata[]>>(AllCams.map(cam => [
       cam,
       this.metadataService.loadImagesMetadata(cam.searchQuery).pipe(
-        this.metadataService.getColorizableImages,
-        this.metadataService.sortColorizedImages,
         shareReplay(1)
       )
     ]));
+
+    this.colorizedImages = new Map<Camera, Observable<ColorizedImage[]>>();
+    this.imagesMetadata.forEach((val, key) =>
+      this.colorizedImages.set(key, val.pipe(
+        this.metadataService.getColorizableImages(),
+        this.metadataService.sortColorizedImages(),
+        shareReplay(1)
+      ))
+    );
+
     this.selectedTabIdx = 0;
     this.selectedTabChange(0);
   }
 
   loadColorizableImages(camera: Camera): Observable<ColorizedImage[]> {
     return this.colorizedImages.get(camera);
+  }
+
+  loadImagesMetadata(camera: Camera): Observable<ImageMetadata[]> {
+    return this.imagesMetadata.get(camera);
   }
 
   loadImage(img: ColorizedImage): void {
@@ -52,5 +67,9 @@ export class CameraComponent implements OnInit {
 
   set selectedTabIdx(val: number) {
     this._selectedTabIdx = val;
+  }
+
+  get displayDebug(): boolean {
+    return !environment.production;
   }
 }

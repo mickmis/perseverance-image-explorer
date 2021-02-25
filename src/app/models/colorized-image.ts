@@ -1,6 +1,4 @@
 import {ImageMetadata} from './metadata';
-import {from, Observable, of} from 'rxjs';
-import {Image} from 'image-js';
 
 export class ColorizedImage {
   red: ImageMetadata;

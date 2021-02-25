@@ -14,6 +14,8 @@ import {MatSliderModule} from '@angular/material/slider';
 import { SideNavComponent } from './side-nav/side-nav.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {MatExpansionModule} from '@angular/material/expansion';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatDividerModule} from '@angular/material/divider';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import {MatExpansionModule} from '@angular/material/expansion';
     MatSidenavModule,
     MatSliderModule,
     FontAwesomeModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatProgressSpinnerModule,
+    MatDividerModule
   ],
   providers: [
     MetadataService,
