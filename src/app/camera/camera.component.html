@@ -6,34 +6,40 @@
 
       <div class="images-panel" *ngIf="idx === selectedTabIdx">
         <mat-expansion-panel hideToggle (opened)="loadImage(colImg)" *ngFor="let colImg of loadColorizableImages(cam)|async" #panel>
+
           <mat-expansion-panel-header collapsedHeight="250px">
             <mat-panel-title style="display: flex; align-items: center;">
-              {{metadataService.parseMarsTime(colImg.red.date_taken_mars)}} (colorized)
+              {{metadataService.parseMarsTime(colImg.refImage.date_taken_mars)}}
+              <span *ngIf="colImg.type === 'RGB'">&nbsp;(RGB combined)</span>
+              <span *ngIf="colImg.type === 'E'">&nbsp;(demosaiced)</span>
             </mat-panel-title>
 
             <mat-panel-description style="display: flex; align-items: center; justify-content: space-around;">
-              <span>{{colImg.red.title}}</span>
-              <img *ngIf="!panel.expanded" style="border: 1px solid rgba(255,255,255,.7); border-radius: 5%;"
-                   alt="Thumbnail of {{colImg.red.imageid}}" height="240px" src="{{colImg.red.image_files.small}}" />
+              <span>{{colImg.refImage.title}}</span>
+              <img *ngIf="!panel.expanded" class="images-thumbnails" alt="Thumbnail of {{colImg.refImage.imageid}}" src="{{colImg.refImage.image_files.small}}" />
             </mat-panel-description>
           </mat-expansion-panel-header>
 
           <ng-template matExpansionPanelContent>
             <figure>
               <img alt="{{colImg.id}}" class="colorized-image" src="{{colImg.colorizedDataUrl}}" />
-              <figcaption style="text-align: center;">{{colImg.red.title}}</figcaption>
+              <figcaption style="text-align: center;">{{colImg.refImage.title}}</figcaption>
             </figure>
-            <p>
+
+            <p *ngIf="colImg.type === 'RGB'">
               Image colorized from
-              <a class="no-color-link" href="{{colImg.red.image_files.full_res}}">red</a>,
-              <a class="no-color-link" href="{{colImg.green.image_files.full_res}}">green</a> and
-              <a class="no-color-link" href="{{colImg.blue.image_files.full_res}}">blue</a>.
+              <a href="{{colImg.red.image_files.full_res}}">red</a>,
+              <a href="{{colImg.green.image_files.full_res}}">green</a> and
+              <a href="{{colImg.blue.image_files.full_res}}">blue</a>.
             </p>
+            <p *ngIf="colImg.type === 'E'"><a href="{{colImg.singleImage.image_files.full_res}}">Source image</a>.</p>
+
             <mat-action-row>
               <button [disabled]="colImg.colorizedResolution === imageService.selectedResolution" mat-button color="accent" (click)="loadImage(colImg)">Recompute</button>
               <button mat-button color="accent" (click)="downloadImage(colImg)">Download</button>
             </mat-action-row>
           </ng-template>
+
         </mat-expansion-panel>
       </div>
 

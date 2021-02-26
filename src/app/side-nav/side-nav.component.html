@@ -1,9 +1,15 @@
 <div class="side-nav-element">
   <h1>Perseverance Image Explorer</h1>
-  <p>Colorize and display images from the Mars 2020 Perseverance rover.</p>
+  <p><b>Colorize and display images from the Mars 2020 Perseverance rover.</b></p>
   <p>
     This web application talks to the <a href="https://mars.nasa.gov/mars2020/multimedia/raw-images/">NASA raw images API</a>
-    to detect the red, green and blue components of an image and perform demosaicing / debayering in the browser.</p>
+    to fetch the images, and colorize them depending on its type:
+  </p>
+  <ul>
+    <li><i>RGB combined</i>: combine the red, blue and green components of the image,</li>
+    <li><i>demosaiced</i>: demosaic / debayer the image.</li>
+  </ul>
+  <p>At the moment, images that are already colored or that cannot be colorized are not displayed.</p>
 </div>
 
 <mat-divider></mat-divider>
@@ -12,6 +18,9 @@
   <label for="resolutionSlider">Image Resolution</label>
   <mat-slider id="resolutionSlider" thumbLabel [displayWith]="ImageResolutionToString" tickInterval="1" min="1" max="4" step="1"
               (change)="resolutionSliderChange($event)" [value]="imageService.selectedResolution"></mat-slider>
+  <small>
+    Has an effect only on <i>RGB combined</i>. The <i>demosaiced</i> images are always full resolution.
+  </small>
 </div>
 
 <mat-divider></mat-divider>

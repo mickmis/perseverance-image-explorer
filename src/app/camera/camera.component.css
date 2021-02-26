@@ -10,3 +10,9 @@
   max-height:100%;
   height: auto;
 }
+
+.images-thumbnails {
+  border: 1px solid rgba(255,255,255,.7);
+  border-radius: 5%;
+  height: 240px;
+}

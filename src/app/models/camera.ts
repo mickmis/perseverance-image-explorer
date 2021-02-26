@@ -4,7 +4,7 @@ export class Camera {
 }
 
 export const NavCams: Camera = {
-  name: 'Navigation Cameras',
+  name: 'Navigation',
   searchQuery: [
     '|NAVCAM_LEFT',
     '|NAVCAM_RIGHT'
@@ -38,7 +38,7 @@ export const MastCams: Camera = {
 };
 
 export const ParachuteCams: Camera = {
-  name: 'Parachute Up-Look Cameras',
+  name: 'Parachute Up-Look',
   searchQuery: [
     '|EDL_PUCAM1',
     '|EDL_PUCAM2'
@@ -46,16 +46,18 @@ export const ParachuteCams: Camera = {
 };
 
 export const DescentCams: Camera = {
-  name: 'Descent Down-Look Cameras',
+  name: 'Descent Down-Look',
   searchQuery: ['|EDL_DDCAM']
 };
 
-export const RoverCams: Camera = {
-  name: 'Rover Up and Down-Look Cameras',
-  searchQuery: [
-    '|EDL_RUCAM',
-    '|EDL_RDCAM'
-  ]
+export const RoverUpCam: Camera = {
+  name: 'Rover Up-Look',
+  searchQuery: ['|EDL_RUCAM']
 };
 
-export const AllCams: Camera[] = [NavCams, FrontHazCams, RearHazCams]; // , MastCams, ParachuteCams, DescentCams, RoverCams];
+export const RoverDownCam: Camera = {
+  name: 'Rover Down-Look',
+  searchQuery: ['|EDL_RDCAM']
+};
+
+export const AllCams: Camera[] = [NavCams, FrontHazCams, RearHazCams, RoverDownCam]; // RoverUpCam, MastCams, ParachuteCams, DescentCams];

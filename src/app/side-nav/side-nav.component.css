@@ -6,7 +6,7 @@
   padding: 1em;
 }
 
-.side-nav-element p, h1, h2 {
+.side-nav-element p, h1, h2, small, span {
   text-align: center;
 }
 

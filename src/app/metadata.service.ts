@@ -90,7 +90,7 @@ export class MetadataService {
   sortColorizedImages(): (pImg: Observable<ColorizedImage[]>) => Observable<ColorizedImage[]> {
     return (pImg: Observable<ColorizedImage[]>) => pImg.pipe(
       tap(() => this._loadingCount++),
-      map(img => img.sort((a, b) => b.red.date_taken_mars.localeCompare(a.red.date_taken_mars))),
+      map(img => img.sort((a, b) => b.refImage.date_taken_mars.localeCompare(a.refImage.date_taken_mars))),
       tap(() => this._loadingCount--),
     );
   }
@@ -99,42 +99,62 @@ export class MetadataService {
     return (images: Observable<ImageMetadata[]>) => images.pipe(
       tap(() => this._loadingCount++),
 
-    // group images by a specific key: camera ID + camera position
+      // for RGB images: group images by a specific key: camera ID + camera position
+      // for E images: just extract them
       map(allImages => {
-        const groupedImgs = new Map<string, Array<ImageMetadata>>();
+        const groupedRgbImgs = new Map<string, Array<ImageMetadata>>();
+        const eImgs = new Array<ImageMetadata>();
         allImages.forEach(img => {
-          const groupKey = img.parsedImageId.cameraId + img.camera.camera_position;
-          if (!groupedImgs.has(groupKey)) {
-            groupedImgs.set(groupKey, new Array<ImageMetadata>());
+          if (!img.parsedImageId) {
+            console.warn(`Missing parsed ID for ${img.imageid}`);
+            return;
           }
-          groupedImgs.get(groupKey).push(img);
+
+          if (img.parsedImageId.imageType === 'E') {
+            eImgs.push(img);
+
+          } else if (
+            img.parsedImageId.imageType === 'R' ||
+            img.parsedImageId.imageType === 'G' ||
+            img.parsedImageId.imageType === 'B') {
+
+            const groupKey = img.parsedImageId.cameraId + img.camera.camera_position;
+            if (!groupedRgbImgs.has(groupKey)) {
+              groupedRgbImgs.set(groupKey, new Array<ImageMetadata>());
+            }
+            groupedRgbImgs.get(groupKey).push(img);
+
+          } else {
+            console.log(`Ignoring type ${img.parsedImageId.imageType} of ${img.imageid}`);
+          }
         });
-        return groupedImgs;
+        const ret: [Map<string, Array<ImageMetadata>>, Array<ImageMetadata>] = [groupedRgbImgs, eImgs];
+        return ret;
       }),
 
       // sort per date the images
-      tap(groupedImgs => groupedImgs.forEach(imageGroup => imageGroup.sort((a, b) => a.date_taken_mars.localeCompare(b.date_taken_mars)))),
+      tap(imgs => imgs[0].forEach(imageGroup =>
+        imageGroup.sort((a, b) => a.date_taken_mars.localeCompare(b.date_taken_mars))
+      )),
+      tap(imgs => imgs[1].sort((a, b) => a.date_taken_mars.localeCompare(b.date_taken_mars))),
 
-      // parse the metadata and generate for each group the ColorizedImage[]
-      // Each group can have several RGB images, in which case the order is important
-      map(groupedImgs => {
+      // generate the ColorizedImage[]
+      map(allImgs => {
         const colImgs = Array<ColorizedImage>();
-        for (const group of groupedImgs.values()) {
+        for (const group of allImgs[0].values()) {
 
+          // parse the metadata and generate for each group the ColorizedImage[]
+          // Each group can have several RGB images, in which case the order is important
           // tslint:disable-next-line:prefer-for-of
           for (let imgIdx = 0 ; imgIdx < group.length ; imgIdx++) {
             const img = group[imgIdx];
-            if (!img.parsedImageId) {
-              console.warn(`Missing parsed ID for ${img.imageid}`);
-              continue;
-            }
 
             if (
               img.parsedImageId.imageType === 'R' &&
               group[imgIdx + 1].parsedImageId.imageType === 'G' &&
               group[imgIdx + 2].parsedImageId.imageType === 'B') {
 
-              const colImg = new ColorizedImage();
+              const colImg = new ColorizedImage('RGB');
               colImg.red = img;
               colImg.green = group[imgIdx + 1];
               colImg.blue = group[imgIdx + 2];
@@ -151,6 +171,14 @@ export class MetadataService {
             }
           }
         }
+
+        // add all the E images
+        colImgs.push(...allImgs[1].map(eImg => {
+          const colImg = new ColorizedImage('E');
+          colImg.singleImage = eImg;
+          return colImg;
+        }));
+
         return colImgs;
       }),
       tap(() => this._loadingCount--)
@@ -161,3 +189,4 @@ export class MetadataService {
     return this._loadingCount;
   }
 }
+// todo: update component to display accordingly the RGB or single

@@ -25,6 +25,7 @@ export class CameraComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.imageService.debayerSingleImg();
     this.imagesMetadata = new Map<Camera, Observable<ImageMetadata[]>>(AllCams.map(cam => [
       cam,
       this.metadataService.loadImagesMetadata(cam.searchQuery).pipe(
