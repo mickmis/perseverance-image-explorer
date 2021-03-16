@@ -97,7 +97,7 @@
 
         <mat-action-row>
   <!--        <button [disabled]="img.colorizedResolution === imageService.selectedResolution" mat-button color="accent" (click)="loadImage(colImg)">Recompute</button>-->
-          <button mat-button color="accent" (click)="downloadImage(img)">Download</button>
+<!--          <button mat-button color="accent" (click)="downloadImage(img)">Download</button>-->
           <button *ngIf="img.isColorizable" mat-button color="accent" (click)="colorizeImage(img)">Colorize</button>
         </mat-action-row>
       </ng-template>
