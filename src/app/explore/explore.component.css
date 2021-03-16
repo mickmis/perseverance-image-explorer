@@ -1,8 +1,25 @@
+ul {
+  list-style-type: none;
+  margin: 0;
+}
+
+.date-left-element {
+  padding-right: 1em;
+}
+
+.params-toggle {
+  display: block;
+}
+
+:host ::ng-deep .mat-button-toggle-label-content {
+  line-height: 2em !important;
+}
+
 .images-panel mat-expansion-panel {
   margin: 1em;
 }
 
-.colorized-image {
+.image-full {
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -11,7 +28,7 @@
   height: auto;
 }
 
-.images-thumbnails {
+.image-thumbnail {
   border: 1px solid rgba(255,255,255,.7);
   border-radius: 5%;
   height: 240px;

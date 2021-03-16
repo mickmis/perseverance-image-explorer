@@ -1,0 +1,141 @@
+<div class="center-flex" style="flex-direction: row; justify-content: space-around; padding: 1em;">
+  <div style="text-align: center;">
+    <h2>Set parameters to select, browse and export images</h2>
+    <h3>Total of {{totalNbImages|async}} images available, currently {{currentNbOfImages|async}} selected</h3>
+
+    <mat-divider></mat-divider>
+
+    <div class="center-flex">
+      <button mat-button color="primary" (click)="updateImagesMetadata(0)">Update selection</button>
+      <button mat-button color="accent" (click)="downloadAllCsv()">Export metadata as CSV</button>
+      <button mat-button color="accent" (click)="downloadAllJson()">Export metadata as JSON</button>
+      <button mat-button color="accent" (click)="downloadAllFileList()">Export images URL (for batch download)</button>
+    </div>
+  </div>
+
+  <div>
+    <p>
+      Sort by
+      <mat-button-toggle-group [(value)]="sortBy" class="sort-toggle" name="fontStyle">
+        <mat-button-toggle value="descending">Newest first</mat-button-toggle>
+        <mat-button-toggle value="ascending">Oldest first</mat-button-toggle>
+      </mat-button-toggle-group>
+    </p>
+
+    <mat-slide-toggle class="params-toggle" style="margin-bottom: 1em;" [(ngModel)]="excludeThumbnails">Exclude thumbnails</mat-slide-toggle>
+
+    <mat-slide-toggle class="params-toggle" [(ngModel)]="restrictPerTime">Restrict per time</mat-slide-toggle>
+    <ul>
+      <li>
+        <mat-form-field [style.width.em]="7" class="date-left-element">
+          <mat-label>From sol</mat-label>
+          <input matInput placeholder="0" type="number" [disabled]="!restrictPerTime" [(ngModel)]="solRange[0]">
+        </mat-form-field>
+
+        <mat-form-field [style.width.em]="7">
+          <mat-label>To sol</mat-label>
+          <input matInput [placeholder]="latestSol|async" type="number" [disabled]="!restrictPerTime" [(ngModel)]="solRange[1]">
+        </mat-form-field>
+      </li>
+
+      <li>
+        <mat-form-field [style.width.em]="7" class="date-left-element">
+          <mat-label>From date</mat-label>
+          <input matInput [matDatepicker]="fromDatePicker" [disabled]="!restrictPerTime" [(ngModel)]="dateRange[0]">
+          <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field [style.width.em]="7">
+          <mat-label>To date</mat-label>
+          <input matInput [matDatepicker]="toDatePicker" [disabled]="!restrictPerTime" [(ngModel)]="dateRange[1]">
+          <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #toDatePicker></mat-datepicker>
+        </mat-form-field>
+      </li>
+    </ul>
+  </div>
+
+  <div>
+    <mat-slide-toggle class="params-toggle" [(ngModel)]="includeAllCameras">Include all cameras</mat-slide-toggle>
+    <ul>
+      <li *ngFor="let camera of allCameras|async">
+        <mat-checkbox [disabled]="includeAllCameras" (change)="updateCameraSelection($event.checked, camera)">
+          {{camera.name}}
+        </mat-checkbox>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div>
+  <mat-paginator [length]="currentNbOfImages|async"
+                 [pageSize]="defaultNbImagesPerPage"
+                 [pageSizeOptions]="imagesPerPageOptions"
+                 (page)="updateImagesMetadata($event.pageIndex, $event.pageSize)">
+  </mat-paginator>
+
+  <div class="images-panel">
+    <mat-expansion-panel hideToggle *ngFor="let img of currentImagesMetadata|async" #panel>
+
+      <mat-expansion-panel-header collapsedHeight="250px">
+        <mat-panel-title style="display: flex; align-items: center;">
+          {{metadataService.parseMarsTime(img.date_taken_mars)}}
+        </mat-panel-title>
+
+        <mat-panel-description style="display: flex; align-items: center; justify-content: space-around;">
+          <span>{{img.title}}</span>
+          <img *ngIf="!panel.expanded" class="image-thumbnail" alt="Thumbnail of {{img.imageid}}" src="{{img.image_files.small}}" />
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <ng-template matExpansionPanelContent>
+        <figure>
+          <img alt="{{img.imageid}}" class="image-full" src="{{imageService.getImageUrl(img)}}" />
+          <figcaption style="text-align: center;">{{img.title}}</figcaption>
+        </figure>
+
+        <mat-action-row>
+  <!--        <button [disabled]="img.colorizedResolution === imageService.selectedResolution" mat-button color="accent" (click)="loadImage(colImg)">Recompute</button>-->
+          <button mat-button color="accent" (click)="downloadImage(img)">Download</button>
+          <button *ngIf="img.isColorizable" mat-button color="accent" (click)="colorizeImage(img)">Colorize</button>
+        </mat-action-row>
+      </ng-template>
+
+    </mat-expansion-panel>
+  </div>
+
+
+<!--  <mat-grid-list cols="3" rowHeight="1:1">-->
+<!--    <mat-grid-tile *ngFor="let img of currentImagesMetadata|async">-->
+<!--      <mat-card>-->
+
+<!--&lt;!&ndash;        <mat-card-title>&ndash;&gt;-->
+<!--&lt;!&ndash;          {{img.parsedImageId.normalOrThumbnail === 'N' ? 'Full image' : 'Thumbnail'}}&ndash;&gt;-->
+<!--&lt;!&ndash;          taken {{metadataService.parseMarsTime(img.date_taken_mars)}}&ndash;&gt;-->
+<!--&lt;!&ndash;          by camera {{img.camera.instrument}}&ndash;&gt;-->
+<!--&lt;!&ndash;        </mat-card-title>&ndash;&gt;-->
+
+<!--&lt;!&ndash;        <mat-card-subtitle>{{img.title}}</mat-card-subtitle>&ndash;&gt;-->
+
+<!--        <figure>-->
+<!--          <img mat-card-image class="images-thumbnails" alt="Thumbnail of {{img.imageid}}" src="{{img.image_files.small}}" />-->
+<!--          <figcaption style="text-align: center;">-->
+<!--            {{img.parsedImageId.normalOrThumbnail === 'N' ? 'Full image' : 'Thumbnail'}}-->
+<!--            taken {{metadataService.parseMarsTime(img.date_taken_mars)}}-->
+<!--            by camera {{img.camera.instrument}}-->
+<!--          </figcaption>-->
+<!--        </figure>-->
+
+<!--        <mat-card-actions class="center-flex" style="flex-direction: row;">-->
+<!--          <button mat-button color="accent" (click)="downloadImage(img)">Download in full resolution</button>-->
+<!--          <button mat-button color="accent">Demosaic</button>-->
+<!--        </mat-card-actions>-->
+
+        <!--<img alt="{{img.imageid}}" class="image" src="{{imageService.resolveImageUrl(img, false)}}" />-->
+
+<!--      </mat-card>-->
+<!--    </mat-grid-tile>-->
+<!--  </mat-grid-list>-->
+</div>
+

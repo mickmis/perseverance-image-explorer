@@ -1,7 +1,5 @@
 // tslint:disable:variable-name
 
-import {ImageId} from './image-id';
-
 export class Metadata {
 
   // "mars2020"
@@ -22,7 +20,10 @@ export class Metadata {
   // "mars2020-images-list-1.1"
   type: string;
 
-  nav: NavMetadata;
+  // "No more images."
+  error_message: string;
+
+  nav: NavMetadata[];
   images: ImageMetadata[];
 }
 
@@ -42,11 +43,6 @@ export class NavMetadata {
 }
 
 export class ImageMetadata {
-
-  // --- custom fields
-  parsedImageId?: ImageId;
-
-  // --- API fields
 
   // "(0.415617,-0.00408664,-0.00947025,0.909481)"
   attitude: string;

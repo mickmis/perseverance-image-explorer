@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 import {ColorModel, Image, ImageKind} from 'image-js';
 import {ImageResolution} from './models/image-resolution';
 import {from, Observable} from 'rxjs';
-import {ColorizedImage} from './models/colorized-image';
 import {tap} from 'rxjs/operators';
 import {combineRGB, demosaic} from './image-processing';
+import {ParsedImageMetadata} from './models/parsed-image-metadata';
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +64,16 @@ export class ImageService {
     });
   }
 
-  colorize(pImg: Observable<ColorizedImage>): Observable<ColorizedImage> {
+  // return the image URL according to the chosen resolution, or the colorized version of it if it exists
+  getImageUrl(img: ParsedImageMetadata): string {
+    if (img.colorizedDataUrl) {
+      return img.colorizedDataUrl;
+    } else {
+      return this.resolveImageUrlResolution(img, false);
+    }
+  }
+
+  colorize(pImg: Observable<ParsedImageMetadata>): Observable<ParsedImageMetadata> {
 
     return pImg.pipe(
       tap(img => {
@@ -73,35 +82,10 @@ export class ImageService {
         }
         this._loadingCount++;
 
-        if (img.type === 'RGB') {
-          // tslint:disable-next-line:one-variable-per-declaration
-          let rUrl, gUrl, bUrl: string;
-          switch (this.selectedResolution) {
-            default:
-            case ImageResolution.Full:
-              rUrl = this.corsProxyUrl + img.red.image_files.full_res;
-              gUrl = this.corsProxyUrl + img.green.image_files.full_res;
-              bUrl = this.corsProxyUrl + img.blue.image_files.full_res;
-              break;
-
-            case ImageResolution.Large:
-              rUrl = this.corsProxyUrl + img.red.image_files.large;
-              gUrl = this.corsProxyUrl + img.green.image_files.large;
-              bUrl = this.corsProxyUrl + img.blue.image_files.large;
-              break;
-
-            case ImageResolution.Medium:
-              rUrl = this.corsProxyUrl + img.red.image_files.medium;
-              gUrl = this.corsProxyUrl + img.green.image_files.medium;
-              bUrl = this.corsProxyUrl + img.blue.image_files.medium;
-              break;
-
-            case ImageResolution.Small:
-              rUrl = this.corsProxyUrl + img.red.image_files.small;
-              gUrl = this.corsProxyUrl + img.green.image_files.small;
-              bUrl = this.corsProxyUrl + img.blue.image_files.small;
-              break;
-          }
+        if (img.parsedImageId.filter === 'RGB') { // todo: fix me this doesn ot work
+          const rUrl = this.resolveImageUrlResolution(img.red, true);
+          const gUrl = this.resolveImageUrlResolution(img.green, true);
+          const bUrl = this.resolveImageUrlResolution(img.blue, true);
           img.colorizedResolution = this.selectedResolution;
 
           return from(
@@ -113,8 +97,8 @@ export class ImageService {
                   this._loadingCount--;
                 })))
           );
-        } else if (img.type === 'E') {
-          const url = this.corsProxyUrl + img.singleImage.image_files.full_res;
+        } else if (img.parsedImageId.filter === 'E') {
+          const url = this.corsProxyUrl + img.image_files.full_res;
           img.colorizedResolution = ImageResolution.Full;
           return from(Image.load(url).then(eImg => {
             const colorized = demosaic(eImg);
@@ -124,6 +108,24 @@ export class ImageService {
         }
       })
     );
+  }
+
+  resolveImageUrlResolution(img: ParsedImageMetadata, throughCorsProxy: boolean): string {
+    const prefix = throughCorsProxy ? this.corsProxyUrl : '';
+    switch (this.selectedResolution) {
+      default:
+      case ImageResolution.Full:
+         return prefix + img.image_files.full_res;
+
+      case ImageResolution.Large:
+        return prefix + img.image_files.large;
+
+      case ImageResolution.Medium:
+        return prefix + img.image_files.medium;
+
+      case ImageResolution.Small:
+        return prefix + img.image_files.small;
+    }
   }
 
   get selectedResolution(): ImageResolution {

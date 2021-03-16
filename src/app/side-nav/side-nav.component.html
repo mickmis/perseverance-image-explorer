@@ -1,32 +1,34 @@
+<!--<mat-divider></mat-divider>-->
+<!--<mat-nav-list id="routing-nav-list">-->
+<!--  <mat-list-item>-->
+<!--    <a routerLink="/colorize" routerLinkActive="routing-nav-link-active">Colorize</a>-->
+<!--  </mat-list-item>-->
+
+<!--  <mat-list-item>-->
+<!--    <a routerLink="/explore" routerLinkActive="routing-nav-link-active">Explore</a>-->
+<!--  </mat-list-item>-->
+<!--</mat-nav-list>-->
+<!--<mat-divider></mat-divider>-->
+
 <div class="side-nav-element">
-  <h1>Perseverance Image Explorer</h1>
-  <p><b>Colorize and display images from the Mars 2020 Perseverance rover.</b></p>
   <p>
     This web application talks to the <a href="https://mars.nasa.gov/mars2020/multimedia/raw-images/">NASA raw images API</a>
-    to fetch the images, and colorize them depending on its type:
+    to explore, export and colorize the images taken by the Perseverance rover on Mars.
   </p>
-  <ul>
-    <li><i>RGB combined</i>: combine the red, blue and green components of the image,</li>
-    <li><i>demosaiced</i>: demosaic / debayer the image.</li>
-  </ul>
-  <p>At the moment, images that are already colored or that cannot be colorized are not displayed.</p>
 </div>
 
 <mat-divider></mat-divider>
 
-<div class="side-nav-element" style="display: flex; flex-direction: column; align-items: center;">
+<div class="side-nav-element center-flex" style="flex-direction: column;">
   <label for="resolutionSlider">Image Resolution</label>
   <mat-slider id="resolutionSlider" thumbLabel [displayWith]="ImageResolutionToString" tickInterval="1" min="1" max="4" step="1"
               (change)="resolutionSliderChange($event)" [value]="imageService.selectedResolution"></mat-slider>
-  <small>
-    Has an effect only on <i>RGB combined</i>. The <i>demosaiced</i> images are always full resolution.
-  </small>
 </div>
 
 <mat-divider></mat-divider>
 
 <div class="side-nav-footer">
-  <div *ngIf="isLoading" class="side-nav-element" style="display: flex; justify-content: center; align-items: center;">
+  <div *ngIf="isLoading" class="side-nav-element center-flex">
     <mat-spinner diameter="30" color="accent"></mat-spinner>
     <span style="font-size: 1em; margin-left: 1em;">
       Loading in progress...
@@ -36,8 +38,11 @@
   <mat-divider></mat-divider>
 
   <div class="side-nav-element">
-    <a class="no-color-link" href="https://github.com/mickmis/perseverance-image-explorer">
+    <a class="side-nav-footer-icon" href="https://github.com/mickmis/perseverance-image-explorer">
       <fa-icon [icon]="faGithub" size="3x"></fa-icon>
+    </a>
+    <a class="side-nav-footer-icon" href="https://twitter.com/Miscul">
+      <fa-icon [icon]="faTwitter" size="3x"></fa-icon>
     </a>
   </div>
 </div>

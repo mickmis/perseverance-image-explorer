@@ -1,12 +1,20 @@
-<mat-sidenav-container fullscreen class="mat-typography">
-  <mat-sidenav mode="side" opened="true">
-    <app-side-nav></app-side-nav>
-  </mat-sidenav>
+<div class="main">
+  <mat-toolbar>
+    <button mat-icon-button (click)="sidenav.toggle()">
+    <mat-icon>menu</mat-icon>
+    </button>
+    <h1 class="app-name">Perseverance Image Explorer</h1>
+  </mat-toolbar>
 
-  <mat-sidenav-content>
-    <div>
-      <app-camera>
-      </app-camera>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  <mat-sidenav-container class="mat-typography">
+    <mat-sidenav #sidenav mode="side" opened="true">
+      <app-side-nav></app-side-nav>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <div>
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
