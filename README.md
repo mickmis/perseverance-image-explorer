@@ -1,27 +1,28 @@
-# PerseveranceImages
+# Perseverance Image Explorer
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.1.
+Perseverance Image Explorer is a web application that talks to the [NASA raw images API](https://mars.nasa.gov/mars2020/multimedia/raw-images/)
+to explore, export and colorize the images taken by the Perseverance rover on Mars. It is implemented in Typescript using Angular v11.
 
-## Development server
+## Upcoming
+- parse and explain in a way that a human can understand a maximum of the metadata
+- group images per observation
+- better demosaicking algorithm: images should not be reduced to 1/4 of their original size
+- attempt to stitch images together
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## What's new
+### 16/03/21 - update
+- add full exploration of images: all images can be browsed with specific parameters
+- add export features: CSV, JSON and flat URL list
+- add pagination of images
+- temporarily disable colorization of RBG images
 
-## Code scaffolding
+### 26/02/21 - update
+- add thumbnails of images
+- add colorization of other type of image (images that can be demosaicked) 
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### 24/02/21 - Initial version 
+- display a filtered list of images per camera (only those that can be colorized)
+- colorize images by combining red, green and blue components
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+# Contact
+[Mickaël Misbach](https://github.com/mickmis) - [mickael@misba.ch](mailto:mickael@misba.ch)
