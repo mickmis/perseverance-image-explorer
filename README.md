@@ -1,3 +1,6 @@
+# Archived Project
+**This project will not be updated anymore.**
+
 # Perseverance Image Explorer
 
 Perseverance Image Explorer is a web application that talks to the [NASA raw images API](https://mars.nasa.gov/mars2020/multimedia/raw-images/)
